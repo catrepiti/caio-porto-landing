@@ -7,6 +7,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2176491546480806');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2176491546480806&ev=PageView&noscript=1"/></noscript>
+  <!-- End Meta Pixel -->
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1691,6 +1705,19 @@
     document.getElementById('panel-wa').style.display   = tab === 'wa'   ? 'block' : 'none';
   }
 
+  /* ── Google Sheets endpoint (cole a URL do Apps Script aqui) ── */
+  const SHEETS_URL = 'COLE_A_URL_DO_APPS_SCRIPT_AQUI';
+
+  function sendToSheets(data) {
+    if (!SHEETS_URL || SHEETS_URL.startsWith('COLE')) return;
+    fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).catch(() => {});
+  }
+
   /* ── Form → WhatsApp redirect ── */
   function handleFormSubmit(e) {
     e.preventDefault();
@@ -1699,6 +1726,14 @@
     const email   = document.getElementById('f-email').value;
     const segment = document.getElementById('f-segment').value || 'Não informado';
     const msg     = document.getElementById('f-msg').value || 'Não informado';
+
+    // Meta Pixel — Lead event
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'Lead', { content_name: 'Formulário LP', content_category: segment });
+    }
+
+    // Google Sheets
+    sendToSheets({ nome: name, whatsapp: phone, email, segmento: segment, desafio: msg, origem: 'Formulário' });
 
     const waMsg = encodeURIComponent(
       `Olá Caio! 👋 Preenchi o formulário do seu site e quero um diagnóstico gratuito.\n\n` +
@@ -1709,7 +1744,6 @@
       `*Desafio:* ${msg}`
     );
 
-    // Show success state
     document.getElementById('lead-form').style.display = 'none';
     document.getElementById('success-msg').style.display = 'block';
 
@@ -1724,6 +1758,14 @@
     const name    = document.getElementById('w-name').value;
     const segment = document.getElementById('w-segment').value || 'Não informado';
     const msg     = document.getElementById('w-msg').value || '';
+
+    // Meta Pixel — Lead event
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'Lead', { content_name: 'WhatsApp LP', content_category: segment });
+    }
+
+    // Google Sheets
+    sendToSheets({ nome: name, whatsapp: '—', email: '—', segmento: segment, desafio: msg, origem: 'WhatsApp' });
 
     const waMsg = encodeURIComponent(
       `Olá Caio! 👋 Quero um diagnóstico gratuito.\n\n` +

@@ -26,7 +26,7 @@
 // 8. Faça git add + commit + push → Vercel atualiza automaticamente
 // ─────────────────────────────────────────────
 
-var HEADERS = ['Hora de envio', 'Nome da loja', 'Telefone', 'E-mail', 'Operação', 'Qual o maior desafio?', 'De onde veio o lead'];
+var HEADERS = ['Hora de envio', 'Nome da loja', 'Telefone', 'E-mail', 'Operação', 'Qual o maior desafio?', 'Disponibilidade', 'De onde veio o lead'];
 
 function doPost(e) {
   try {
@@ -37,12 +37,13 @@ function doPost(e) {
 
     sheet.appendRow([
       new Date(),
-      data.nome     || '',
-      data.whatsapp || '',
-      data.email    || '',
-      data.segmento || '',
-      data.desafio  || '',
-      data.origem   || ''
+      data.nome            || '',
+      data.whatsapp        || '',
+      data.email           || '',
+      data.segmento        || '',
+      data.desafio         || '',
+      data.disponibilidade || '',
+      data.origem          || ''
     ]);
 
     return ContentService

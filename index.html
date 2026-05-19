@@ -1627,6 +1627,18 @@
               <label>Qual é seu maior desafio?</label>
               <textarea id="f-msg" placeholder="Ex: meu custo por lead está alto, estou perdendo leads no comercial, não sei escalar os anúncios..."></textarea>
             </div>
+            <div class="form-group">
+              <label>Disponibilidade para reunião *</label>
+              <select id="f-availability" required>
+                <option value="" disabled selected>Quando prefere se reunir?</option>
+                <option>Segunda a sexta — Manhã (8h–12h)</option>
+                <option>Segunda a sexta — Tarde (13h–18h)</option>
+                <option>Segunda a sexta — Noite (18h–21h)</option>
+                <option>Sábado — Manhã (8h–12h)</option>
+                <option>Sábado — Tarde (13h–17h)</option>
+                <option>Qualquer dia e horário</option>
+              </select>
+            </div>
             <button type="submit" class="btn-submit">
               Quero minha auditoria gratuita de 20 min →
             </button>
@@ -1664,6 +1676,18 @@
             <div class="form-group">
               <label>Conte seu desafio</label>
               <textarea id="w-msg" placeholder="O que você quer resolver? Seja direto — isso nos ajuda a já ir preparados para a conversa." style="min-height:90px;"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Disponibilidade para reunião *</label>
+              <select id="w-availability" required>
+                <option value="" disabled selected>Quando prefere se reunir?</option>
+                <option>Segunda a sexta — Manhã (8h–12h)</option>
+                <option>Segunda a sexta — Tarde (13h–18h)</option>
+                <option>Segunda a sexta — Noite (18h–21h)</option>
+                <option>Sábado — Manhã (8h–12h)</option>
+                <option>Sábado — Tarde (13h–17h)</option>
+                <option>Qualquer dia e horário</option>
+              </select>
             </div>
             <button type="submit" class="btn-submit wa-mode">
               <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;fill:#fff;flex-shrink:0;"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.822.737 5.47 2.027 7.77L.064 31.04a1 1 0 0 0 1.215 1.215l7.27-1.963A15.94 15.94 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm8.27 22.363c-.354.996-2.066 1.91-2.843 1.973-.734.06-1.424.345-4.787-1-4.02-1.632-6.58-5.72-6.778-5.984-.198-.266-1.618-2.152-1.618-4.103 0-1.951 1.022-2.91 1.382-3.306.36-.396.785-.496 1.046-.496.266 0 .528.002.759.014.24.012.563-.09.882.673.354.835 1.202 2.9 1.308 3.113.107.213.178.463.036.743-.142.281-.213.455-.424.7-.213.248-.447.553-.638.742-.213.212-.434.44-.187.863.248.424 1.1 1.814 2.363 2.938 1.622 1.445 2.99 1.892 3.41 2.105.424.213.672.178.918-.107.248-.283 1.06-1.237 1.342-1.66.284-.424.568-.354.954-.213.389.142 2.457 1.16 2.88 1.37.424.213.706.319.81.496.107.178.107 1.034-.247 2.03z"/></svg>
@@ -1721,11 +1745,12 @@
   /* ── Form → WhatsApp redirect ── */
   function handleFormSubmit(e) {
     e.preventDefault();
-    const name    = document.getElementById('f-name').value;
-    const phone   = document.getElementById('f-phone').value;
-    const email   = document.getElementById('f-email').value;
-    const segment = document.getElementById('f-segment').value || 'Não informado';
-    const msg     = document.getElementById('f-msg').value || 'Não informado';
+    const name         = document.getElementById('f-name').value;
+    const phone        = document.getElementById('f-phone').value;
+    const email        = document.getElementById('f-email').value;
+    const segment      = document.getElementById('f-segment').value || 'Não informado';
+    const msg          = document.getElementById('f-msg').value || 'Não informado';
+    const availability = document.getElementById('f-availability').value || 'Não informado';
 
     // Meta Pixel — Lead event
     if (typeof fbq !== 'undefined') {
@@ -1733,7 +1758,7 @@
     }
 
     // Google Sheets
-    sendToSheets({ nome: name, whatsapp: phone, email, segmento: segment, desafio: msg, origem: 'Formulário' });
+    sendToSheets({ nome: name, whatsapp: phone, email, segmento: segment, desafio: msg, disponibilidade: availability, origem: 'Formulário' });
 
     const waMsg = encodeURIComponent(
       `Olá Caio! 👋 Preenchi o formulário do seu site e quero um diagnóstico gratuito.\n\n` +
@@ -1741,7 +1766,8 @@
       `*WhatsApp:* ${phone}\n` +
       `*E-mail:* ${email}\n` +
       `*Segmento:* ${segment}\n` +
-      `*Desafio:* ${msg}`
+      `*Desafio:* ${msg}\n` +
+      `*Disponibilidade:* ${availability}`
     );
 
     document.getElementById('lead-form').style.display = 'none';
@@ -1755,9 +1781,10 @@
   /* ── WhatsApp tab form ── */
   function handleWASubmit(e) {
     e.preventDefault();
-    const name    = document.getElementById('w-name').value;
-    const segment = document.getElementById('w-segment').value || 'Não informado';
-    const msg     = document.getElementById('w-msg').value || '';
+    const name         = document.getElementById('w-name').value;
+    const segment      = document.getElementById('w-segment').value || 'Não informado';
+    const msg          = document.getElementById('w-msg').value || '';
+    const availability = document.getElementById('w-availability').value || 'Não informado';
 
     // Meta Pixel — Lead event
     if (typeof fbq !== 'undefined') {
@@ -1765,12 +1792,13 @@
     }
 
     // Google Sheets
-    sendToSheets({ nome: name, whatsapp: '—', email: '—', segmento: segment, desafio: msg, origem: 'WhatsApp' });
+    sendToSheets({ nome: name, whatsapp: '—', email: '—', segmento: segment, desafio: msg, disponibilidade: availability, origem: 'WhatsApp' });
 
     const waMsg = encodeURIComponent(
       `Olá Caio! 👋 Quero um diagnóstico gratuito.\n\n` +
       `*Nome:* ${name}\n` +
-      `*Segmento:* ${segment}` +
+      `*Segmento:* ${segment}\n` +
+      `*Disponibilidade:* ${availability}` +
       (msg ? `\n*Desafio:* ${msg}` : '')
     );
 

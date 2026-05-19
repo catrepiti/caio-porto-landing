@@ -1838,8 +1838,62 @@
     const item = btn.closest('.faq-item');
     const isOpen = item.classList.contains('open');
     document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
-    if (!isOpen) item.classList.add('open');
+    if (!isOpen) {
+      item.classList.add('open');
+      fbqEvent('trackCustom', 'FAQOpen', { pergunta: btn.textContent.trim() });
+    }
   }
+
+  /* ── Pixel helper ── */
+  function fbqEvent(type, event, params) {
+    if (typeof fbq !== 'undefined') fbq(type, event, params || {});
+  }
+
+  /* ── Pixel: cliques em WhatsApp ── */
+  document.querySelectorAll('a[href*="wa.me"]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      fbqEvent('track', 'Contact', { content_name: 'WhatsApp', content_category: el.closest('section')?.id || 'global' });
+    });
+  });
+
+  /* ── Pixel: clique no e-mail ── */
+  document.querySelectorAll('a[href*="mail.google"]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      fbqEvent('track', 'Contact', { content_name: 'Email' });
+    });
+  });
+
+  /* ── Pixel: cliques nos CTAs de auditoria ── */
+  document.querySelectorAll('a[href="#contato"], a.nav-cta').forEach(function(el) {
+    el.addEventListener('click', function() {
+      fbqEvent('track', 'Schedule', { content_name: el.textContent.trim() });
+    });
+  });
+
+  /* ── Pixel: ViewContent por seção ── */
+  var sections = [
+    { id: 'sobre',         name: 'Sobre' },
+    { id: 'servicos',      name: 'Serviços' },
+    { id: 'como-funciona', name: 'Como Funciona' },
+    { id: 'whatsapp',      name: 'WhatsApp' },
+    { id: 'resultados',    name: 'Resultados' },
+    { id: 'faq',           name: 'FAQ' },
+    { id: 'contato',       name: 'Contato' }
+  ];
+  var sectionObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var sec = sections.find(function(s) { return s.id === entry.target.id; });
+        if (sec) fbqEvent('track', 'ViewContent', { content_name: sec.name, content_type: 'section' });
+        sectionObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(function(s) {
+    var el = document.getElementById(s.id);
+    if (el) sectionObserver.observe(el);
+  });
 
   /* ── Scroll-based nav shadow ── */
   window.addEventListener('scroll', () => {

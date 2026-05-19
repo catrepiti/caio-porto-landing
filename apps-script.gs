@@ -26,10 +26,14 @@
 // 8. Faça git add + commit + push → Vercel atualiza automaticamente
 // ─────────────────────────────────────────────
 
+var HEADERS = ['Data', 'Nome', 'WhatsApp', 'E-mail', 'Segmento', 'Desafio', 'Origem'];
+
 function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data  = JSON.parse(e.postData.contents);
+
+    garantirCabecalhos(sheet);
 
     sheet.appendRow([
       new Date(),
@@ -52,8 +56,22 @@ function doPost(e) {
   }
 }
 
-// Teste manual: rode esta função dentro do Apps Script para verificar se está gravando
+function garantirCabecalhos(sheet) {
+  var primeiraLinha = sheet.getRange(1, 1, 1, HEADERS.length).getValues()[0];
+  var vazia = primeiraLinha.every(function(c) { return c === ''; });
+  if (vazia) {
+    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+    sheet.getRange(1, 1, 1, HEADERS.length)
+      .setBackground('#1a56db')
+      .setFontColor('#ffffff')
+      .setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+}
+
+// Teste manual: rode esta função para verificar se está gravando
 function testar() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  garantirCabecalhos(sheet);
   sheet.appendRow([new Date(), 'Teste', '(31) 99999-9999', 'teste@email.com', 'E-commerce', 'Teste de integração', 'Script']);
 }

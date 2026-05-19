@@ -26,7 +26,7 @@
 // 8. Faça git add + commit + push → Vercel atualiza automaticamente
 // ─────────────────────────────────────────────
 
-var HEADERS = ['Data', 'Nome', 'WhatsApp', 'E-mail', 'Segmento', 'Desafio', 'Origem'];
+var HEADERS = ['Hora de envio', 'Nome da loja', 'Telefone', 'E-mail', 'Operação', 'Qual o maior desafio?', 'De onde veio o lead'];
 
 function doPost(e) {
   try {
